@@ -22,9 +22,10 @@
 			<value>tiger</value>
 		</property>
 	</bean>
-	-->
+	 -->
 	
 	<!--  MySQL -->
+
 	<bean id="dataSource"
 		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
 		<property name="driverClassName">
@@ -41,7 +42,6 @@
 			<value>user00</value>
 		</property>
 	</bean>
-	
 
 	<bean id="sqlSessionFactory"
 		class="org.mybatis.spring.SqlSessionFactoryBean">
@@ -73,21 +73,22 @@
 			</value>
 		</property>
 	</bean>
-	-->
+	 -->
+	
 	<!--  MySQL 연결 -->
+
 	<bean id="sessionFactory"
 		class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
-	<property name="dataSource" ref="dataSource" />
-	<property name="mappingResources">
-		<list>
-			<value>kr/co/adamsoft/dao/item.hbm.xml</value>
-		</list>
-	</property>
-	<property name="hibernateProperties">
-		<value>
-			hibernate.dialect=org.hibernate.dialect.MySQLDialect
-		</value>
-	</property>
-</bean>
-	
+		<property name="dataSource" ref="dataSource" />
+		<property name="mappingResources">
+			<list>
+				<value>kr/co/adamsoft/dao/item.hbm.xml</value>
+			</list>
+		</property>
+		<property name="hibernateProperties">
+			<value>
+				hibernate.dialect=org.hibernate.dialect.MySQLDialect
+			</value>
+		</property>
+	</bean>	
 </beans>

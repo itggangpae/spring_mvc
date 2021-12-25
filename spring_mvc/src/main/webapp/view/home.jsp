@@ -25,6 +25,17 @@
 			<li><a href="newarticle" class="menu">새글</a></li>
 			<li><a href="redirect" class="menu">리다이렉트</a></li>
 			<li><a href="header" class="menu">JSON</a></li>
+			<c:if test="${userinfo.email == null}">
+				<li><a href="user/join" class="menu">회원가입</a></li>
+				<li><a href="user/login" class="menu">로그인</a></li>
+			</c:if>
+			<c:if test="${userinfo.email != null}">
+				<li><img
+					src="${pageContext.request.contextPath}/profile/${userinfo.image}" />${userinfo.nickname}님
+					<a href="user/logout" class="menu">로그아웃</a></li>
+				<li><a href="user/update" class="menu">회원 정보 수정</a></li>
+			</c:if>
+
 		</ul>
 		<h2>상품 목록 화면</h2>
 		<table border="1">

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="springuser">
+	<!-- <select id="emailcheck" parameterType="java.lang.String" resultType="java.lang.String"> 
+		select email from springuser where email = #{email} </select> -->
+
+	<select id="emailcheck" resultType="java.lang.String">
+		select email
+		from springuser
+	</select>
+
+
+	<select id="nicknamecheck" parameterType="java.lang.String"
+		resultType="java.lang.String">
+		select nickname
+		from springuser
+		where nickname = #{nickname}
+	</select>
+
+	<insert id="join"
+		parameterType="kr.co.adamsoft.domain.SpringUser">
+		INSERT INTO SPRINGUSER(EMAIL, PW, NICKNAME, IMAGE)
+		values(#{email}, #{pw}, #{nickname}, #{image})
+	</insert>
+
+	<select id="login" resultType="kr.co.adamsoft.domain.SpringUser">
+		select email, pw, nickname, image
+		from springuser
+	</select>
+	<update id="update" parameterType="kr.co.adamsoft.domain.SpringUser">
+		update  SPRINGUSER
+		set PW=#{pw}, IMAGE=#{image}
+		where nickname = #{nickname}
+	</update>
+
+</mapper>

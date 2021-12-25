@@ -1,102 +1,144 @@
 package kr.co.adamsoft.util;
 
-
+import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
+import java.security.AlgorithmParameters;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.security.spec.KeySpec;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.InvalidParameterSpecException;
+import java.util.Base64;
 
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.codec.binary.Hex;
-
-
 public class CryptoUtil {
-    private static final int keySize = 128;
-    private static final int iterationCount = 10000;
-    private static String salt = "79752f1d3fd2432043c48e45b35b24645eb826a25c6f1804e9152665c345a552";
-    private static String iv = "2fad5a477d13ecda7f718fbd8a9f0443";
-    private static final String passPhrase = "passPhrase";
-    
-    private final Cipher cipher;
-    
-    
-    public CryptoUtil() {
-        try {
-            cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    
-    public String encrypt(String plaintext) throws Exception {
-        return encrypt(salt, iv, passPhrase, plaintext);
-    }
-    
-    
-    public String decrypt(String ciphertext) throws Exception {
-        return decrypt(salt, iv, passPhrase, ciphertext);
-    }
-    
-    
-    private String encrypt(String salt, String iv, String passPhrase, String plaintext) throws Exception {
-        SecretKey key = generateKey(salt, passPhrase);
-        byte[] encrypted = doFinal(Cipher.ENCRYPT_MODE, key, iv, plaintext.getBytes("UTF-8"));
-        return encodeBase64(encrypted);
-    }
-
-    
-    private String decrypt(String salt, String iv, String passPhrase, String ciphertext) throws Exception {
-        SecretKey key = generateKey(salt, passPhrase);
-        byte[] decrypted = doFinal(Cipher.DECRYPT_MODE, key, iv, decodeBase64(ciphertext));
-        return new String(decrypted, "UTF-8");
-    }
-
-    
-    private byte[] doFinal(int encryptMode, SecretKey key, String iv, byte[] bytes) throws Exception {
-        cipher.init(encryptMode, key, new IvParameterSpec(decodeHex(iv)));
-        return cipher.doFinal(bytes);
-    }
-
-    
-    private SecretKey generateKey(String salt, String passPhrase) throws Exception {
-        SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
-        KeySpec spec = new PBEKeySpec(passPhrase.toCharArray(), decodeHex(salt), iterationCount, keySize);
-        SecretKey key = new SecretKeySpec(factory.generateSecret(spec).getEncoded(), "AES");
-        return key;
-    }
-    
-    
-    private static String encodeBase64(byte[] bytes) {
-        return Base64.encodeBase64String(bytes);
-    }
-
-    
-    private static byte[] decodeBase64(String str) {
-        return Base64.decodeBase64(str);
-    }
-
-    
-    private static String encodeHex(byte[] bytes) {
-        return Hex.encodeHexString(bytes);
-    }
-
-    
-    private static byte[] decodeHex(String str) throws Exception {
-        return Hex.decodeHex(str.toCharArray());
-    }
-    
-    
-    private static String getRandomHexString(int length) {
-        byte[] salt = new byte[length];
-        new SecureRandom().nextBytes(salt);
-        return encodeHex(salt);
-
-    }
+	/**
+	 * MD5 로 해시 한다.
+	 * 
+	 * @param msg
+	 * @return
+	 */
+	public static String md5(String msg) throws NoSuchAlgorithmException {
+		MessageDigest md = MessageDigest.getInstance("MD5");
+		md.update(msg.getBytes());
+		return CryptoUtil.byteToHexString(md.digest());
+	}
+	
+	/**
+	 * SHA-256으로 해시한다.
+	 * 
+	 * @param msg
+	 * @return
+	 */
+	public static String sha256(String msg)  throws NoSuchAlgorithmException {
+		MessageDigest md = MessageDigest.getInstance("SHA-256");
+		md.update(msg.getBytes());
+		return CryptoUtil.byteToHexString(md.digest());
+	}
+	
+	/**
+	 * 바이트 배열을 HEX 문자열로 변환한다.
+	 * @param data
+	 * @return
+	 */
+	public static String byteToHexString(byte[] data) {
+		StringBuilder sb = new StringBuilder();
+		for(byte b : data) {
+			sb.append(Integer.toString((b & 0xff) + 0x100, 16).substring(1));
+		}
+		return sb.toString();
+	}
+	
+	/**
+	 * AES 256 으로 암호화 한다.
+	 * @param msg
+	 * @param key
+	 * @return
+	 * @throws NoSuchAlgorithmException
+	 * @throws InvalidKeySpecException
+	 * @throws NoSuchPaddingException
+	 * @throws InvalidKeyException
+	 * @throws InvalidParameterSpecException
+	 * @throws UnsupportedEncodingException
+	 * @throws BadPaddingException
+	 * @throws IllegalBlockSizeException
+	 */
+	public static String encryptAES256(String msg, String key) throws NoSuchAlgorithmException, InvalidKeySpecException, NoSuchPaddingException, InvalidKeyException, InvalidParameterSpecException, UnsupportedEncodingException, BadPaddingException, IllegalBlockSizeException {
+		SecureRandom random = new SecureRandom();
+		byte bytes[] = new byte[20];
+		random.nextBytes(bytes);
+		byte[] saltBytes = bytes;
+		
+		// Password-Based Key Derivation function 2
+		SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+		// 70000번 해시하여 256 bit 길이의 키를 만든다.
+		PBEKeySpec spec = new PBEKeySpec(key.toCharArray(), saltBytes, 70000, 256);
+		
+		SecretKey secretKey = factory.generateSecret(spec);
+		SecretKeySpec secret = new SecretKeySpec(secretKey.getEncoded(), "AES");
+		
+		// 알고리즘/모드/패딩
+		// CBC : Cipher Block Chaining Mode
+		Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+		cipher.init(Cipher.ENCRYPT_MODE, secret);
+		AlgorithmParameters params = cipher.getParameters();
+		// Initial Vector(1단계 암호화 블록용)
+		byte[] ivBytes = params.getParameterSpec(IvParameterSpec.class).getIV();
+		
+		byte[] encryptedTextBytes = cipher.doFinal(msg.getBytes("UTF-8"));
+		
+		byte[] buffer = new byte[saltBytes.length + ivBytes.length + encryptedTextBytes.length];
+		System.arraycopy(saltBytes, 0, buffer, 0, saltBytes.length);
+        System.arraycopy(ivBytes, 0, buffer, saltBytes.length, ivBytes.length);
+	    System.arraycopy(encryptedTextBytes, 0, buffer, saltBytes.length + ivBytes.length, encryptedTextBytes.length);
+	    
+		return Base64.getEncoder().encodeToString(buffer);
+	}
+	
+	/**
+	 * 위에서 암호화된 내용을 복호화 한다.
+	 * @param msg
+	 * @param key
+	 * @return
+	 * @throws NoSuchPaddingException
+	 * @throws NoSuchAlgorithmException
+	 * @throws InvalidKeySpecException
+	 * @throws InvalidAlgorithmParameterException
+	 * @throws InvalidKeyException
+	 * @throws BadPaddingException
+	 * @throws IllegalBlockSizeException
+	 */
+	public static String decryptAES256(String msg, String key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeySpecException, InvalidAlgorithmParameterException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
+		Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+		ByteBuffer buffer = ByteBuffer.wrap(Base64.getDecoder().decode(msg));
+		
+		byte[] saltBytes = new byte[20];
+		buffer.get(saltBytes, 0, saltBytes.length);
+		byte[] ivBytes = new byte[cipher.getBlockSize()];
+		buffer.get(ivBytes, 0, ivBytes.length);
+		byte[] encryoptedTextBytes = new byte[buffer.capacity() - saltBytes.length - ivBytes.length];
+		buffer.get(encryoptedTextBytes);
+		
+		SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+		PBEKeySpec spec = new PBEKeySpec(key.toCharArray(), saltBytes, 70000, 256);
+		
+		SecretKey secretKey = factory.generateSecret(spec);
+		SecretKeySpec secret = new SecretKeySpec(secretKey.getEncoded(), "AES");
+		
+		cipher.init(Cipher.DECRYPT_MODE, secret, new IvParameterSpec(ivBytes));
+		
+		byte[] decryptedTextBytes = cipher.doFinal(encryoptedTextBytes);
+		return new String(decryptedTextBytes);
+	}
 }
