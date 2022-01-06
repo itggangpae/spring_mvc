@@ -24,7 +24,7 @@
 			<li><a href="message/detail/10" class="menu">디렉토리 패턴의 매개변수</a></li>
 			<li><a href="newarticle" class="menu">새글</a></li>
 			<li><a href="redirect" class="menu">리다이렉트</a></li>
-			<li><a href="header" class="menu">JSON</a></li>
+			<li><a href="header" class="menu">헤더 설정</a></li>
 			<c:if test="${userinfo.email == null}">
 				<li><a href="user/join" class="menu">회원가입</a></li>
 				<li><a href="user/login" class="menu">로그인</a></li>
@@ -35,8 +35,22 @@
 					<a href="user/logout" class="menu">로그아웃</a></li>
 				<li><a href="user/update" class="menu">회원 정보 수정</a></li>
 			</c:if>
-
 		</ul>
+		
+		<h3>인터셉터 적용</h3>
+		<ul>
+			<c:if test="${LOGIN == null }">
+				<li><a href="interceptor/login" class="menu">로그인</a></li>
+			</c:if>
+			<c:if test="${LOGIN != null }">
+				<li><a href="interceptor/logout" class="menu">로그아웃</a></li>
+			</c:if>
+			<li><a href="board/boardlist" class="menu">게시물 보기</a></li>
+			<li><a href="board/boardwrite" class="menu">게시물 쓰기</a></li>
+			<li><a href="board/noticewrite" class="menu">공지사항 쓰기</a></li>
+		</ul>
+
+
 		<h2>상품 목록 화면</h2>
 		<table border="1">
 			<tr class="header">

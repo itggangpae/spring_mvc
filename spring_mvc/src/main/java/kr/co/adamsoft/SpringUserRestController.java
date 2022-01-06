@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 @RestController
-public class UserRestController {
+public class SpringUserRestController {
 	@Autowired
 	private SpringUserService springUserService;
 	
@@ -25,12 +25,12 @@ public class UserRestController {
 	
 	@RequestMapping(value="user/emailcheck", method=RequestMethod.GET)
 	public Map<String, Object> emailcheck(HttpServletRequest request, HttpServletResponse response) {
-		return springUserService.emailcheck(request, response);
+		return springUserService.emailCheck(request, response);
 	}
 	
 	@RequestMapping(value="user/nicknamecheck", method=RequestMethod.GET)
 	public Map<String, Object> nicknamecheck(HttpServletRequest request, HttpServletResponse response) {
-		return springUserService.nicknamecheck(request, response);
+		return springUserService.nicknameCheck(request, response);
 	}
 	
 	@RequestMapping(value="user/login", method=RequestMethod.POST)

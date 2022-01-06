@@ -70,8 +70,13 @@ window.addEventListener("load", function(event){
 	  	})
 	})
 	
-	var flag = false;
+	
 	joinbtn.addEventListener("click", function(event){
+		var flag = false;
+		emailmsg.innerHTML = '';
+		pwmsg.innerHTML = ''
+		nicknamemsg.innerHTML = '';
+		
 		if (email.value.trim().length < 1) {
 			emailmsg.innerHTML = '이메일은 필수 입력입니다.<br/>';
 			flag = true;
@@ -79,6 +84,7 @@ window.addEventListener("load", function(event){
 			var emailRegExp = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/i;
 			if (!emailRegExp.test(email.value.trim())) {
 					emailmsg.innerHTML = '잘못된 이메일 형식입니다.<br/>';
+					flag=true;
 			}
 		}
 
@@ -119,7 +125,6 @@ window.addEventListener("load", function(event){
 		  	
 		request.open("post", url, true);
 		var formdata = new FormData(joinform);
-		alert(formdata)
 		request.send(formdata);
 		request.addEventListener('load', function show(e){
 			 var map = JSON.parse(e.target.responseText);

@@ -33,13 +33,14 @@
 
 	<default-servlet-handler />
 
-	<tx:annotation-driven />
-
+	
+	<!-- hibernate 의 트랜잭션 매니저 -->
 	<beans:bean id="transactionManager"
 		class="org.springframework.orm.hibernate5.HibernateTransactionManager">
-		<beans:property name="sessionFactory"
-			ref="sessionFactory" />
+		<beans:property name="sessionFactory" ref="sessionFactory" />
 	</beans:bean>
+	
+	<tx:annotation-driven />
 
 	<beans:bean
 		class="org.springframework.web.servlet.view.BeanNameViewResolver">
@@ -83,6 +84,24 @@
 	<beans:bean id="multipartResolver"
 		class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
 	</beans:bean>
+
+
+	<view-controller path="/board/boardwrite"
+		view-name="/board/boardwrite" />
+	<view-controller path="/board/noticewrite"
+		view-name="/board/noticewrite" />
+
+	<interceptors>
+		<interceptor>
+			<mapping path="/board/boardwrite" />
+			<mapping path="/board/noticewrite" />
+			<beans:ref bean="authInterceptor" />
+		</interceptor>
+		<interceptor>
+			<mapping path="/interceptor/login" />
+			<beans:ref bean="loginInterceptor" />
+		</interceptor>
+	</interceptors>
 
 
 </beans:beans>

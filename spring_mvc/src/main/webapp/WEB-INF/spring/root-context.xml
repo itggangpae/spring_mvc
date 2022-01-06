@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd">
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
 
 
 
@@ -43,6 +45,8 @@
 		</property>
 	</bean>
 
+	<!-- xml 파일을 사용하는 MyBatis를 이용할 때 사용하는 Bean -->
+	<!-- 
 	<bean id="sqlSessionFactory"
 		class="org.mybatis.spring.SqlSessionFactoryBean">
 		<property name="dataSource" ref="dataSource" />
@@ -56,8 +60,29 @@
 		class="org.mybatis.spring.SqlSessionTemplate">
 		<constructor-arg index="0" ref="sqlSessionFactory" />
 	</bean>
+ 	-->
+ 	
+ 	<!-- Mapper 인터페이스를 이용하는 MyBatis 설정 -->
+	<bean class="org.mybatis.spring.SqlSessionFactoryBean" id="sqlSessionFactory">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
 
-	<!--  오라클 연결  -->
+	<!-- Mapper 인터페이스 스캔 위치 설정 -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="kr.co.adamsoft.dao"/>
+	</bean>
+	
+	<!-- Spring JDBC 와 MyBatis 의 트랜잭션 매니저 -->
+	<!-- 
+	<bean class="org.springframework.jdbc.datasource.DataSourceTransactionManager"
+		id="transactionManager">
+		<property name="dataSource" ref="dataSource"/>
+	</bean>
+ 
+ 	<tx:annotation-driven />
+  	-->
+  
+	<!--  하이버네이트 오라클 연결  -->
 	<!-- 
 	<bean id="sessionFactory"
 		class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
@@ -76,7 +101,6 @@
 	 -->
 	
 	<!--  MySQL 연결 -->
-
 	<bean id="sessionFactory"
 		class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
 		<property name="dataSource" ref="dataSource" />

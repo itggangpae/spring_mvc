@@ -1,6 +1,6 @@
 package kr.co.adamsoft.service;
 
-import kr.co.adamsoft.dao.SpringUserDao;
+import kr.co.adamsoft.dao.SpringUserMapper;
 import kr.co.adamsoft.domain.SpringUser;
 import kr.co.adamsoft.util.CryptoUtil;
 
@@ -25,7 +25,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 @Service
 public class SpringUserServiceImpl implements SpringUserService {
 	@Autowired
-	private SpringUserDao springUserDao;
+	private SpringUserMapper springUserDao;
 
 	@Override
 	public Map<String, Object> join(MultipartHttpServletRequest request, HttpServletResponse response) {
@@ -40,6 +40,7 @@ public class SpringUserServiceImpl implements SpringUserService {
 		String pw = request.getParameter("pw");
 		String nickname = request.getParameter("nickname");
 		String key = "itggangpae";
+		
 		/*
 		String emailResult = springUserDao.emailCheck(email);
 		if (emailResult == null) {
@@ -47,25 +48,31 @@ public class SpringUserServiceImpl implements SpringUserService {
 		} else {
 			map.put("emailcheck", false);
 		}
+		 */
+
+
+		/*
+		String emailResult = springUserDao.emailCheck(email);
+
+		if (emailResult == null) {
+			map.put("emailcheck", true);
+		} else {
+			map.put("emailcheck", false);
+		}
 		*/
 		
-
-		String emailResult = null;
-		List<String> list = springUserDao.emailCheck();
+		List<String> emailList = springUserDao.emailCheck();
+		boolean flag = false;
+		
 		try {
-			for(String imsi : list) {
-				if(CryptoUtil.decryptAES256(imsi, key).equals(email)){
-					emailResult = imsi;
+			for(String encryptEmail : emailList) {
+				if(email.equals(CryptoUtil.decryptAES256(encryptEmail, "itggangpae"))) {
+					flag = true;
 					break;
 				}
 			}
-			if (emailResult == null) {
-				map.put("emailcheck", true);
-			} else {
-				map.put("emailcheck", false);
-			}
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
+		}catch(Exception e) {
+			System.out.println(e.getLocalizedMessage());
 		}
 
 
@@ -76,8 +83,9 @@ public class SpringUserServiceImpl implements SpringUserService {
 			map.put("nicknamecheck", false);
 		}
 		
+
 		String image = "default.jpg";
-		if (emailResult == null && nicknameResult == null) {
+		if (flag == false && nicknameResult == null) {
 			MultipartFile imageFile = request.getFile("image");
 			System.out.println(imageFile.isEmpty());
 			if (imageFile.isEmpty() == false) {
@@ -99,11 +107,10 @@ public class SpringUserServiceImpl implements SpringUserService {
 					System.out.println(e.getLocalizedMessage());
 				}
 			}
-			
 
 			SpringUser user = new SpringUser();
 			try {
-				
+
 				user.setEmail(CryptoUtil.encryptAES256(email, key));
 				user.setPw(BCrypt.hashpw(pw, BCrypt.gensalt()));
 				user.setNickname(nickname);
@@ -121,37 +128,37 @@ public class SpringUserServiceImpl implements SpringUserService {
 	}
 
 	@Override
-	public Map<String, Object> emailcheck(HttpServletRequest request, HttpServletResponse response) {
-		String email = request.getParameter("email");
-		String key = "itggangpae";
-		
-		String emailResult = null;
+	public Map<String, Object> emailCheck(HttpServletRequest request, HttpServletResponse response) {
 		Map<String, Object> map = new HashMap<>();
-		
-		List<String> list = springUserDao.emailCheck();
+
+		String email = request.getParameter("email");
+		List<String> emailList = springUserDao.emailCheck();
+
+		boolean flag = false;
 		try {
-			for(String imsi : list) {
-				if(CryptoUtil.decryptAES256(imsi, key).equals(email)){
-					emailResult = imsi;
+			for(String encryptEmail : emailList) {
+				if(email.equals(CryptoUtil.decryptAES256(encryptEmail, "itggangpae"))) {
+					flag = true;
 					break;
 				}
 			}
-			if (emailResult == null) {
-				map.put("emailcheck", true);
-			} else {
-				map.put("emailcheck", false);
-			}
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
+		}catch(Exception e) {
+			System.out.println(e.getLocalizedMessage());
+		}
+
+		if(flag == false) {
+			map.put("emailcheck", true);
+		} else {
+			map.put("emailcheck", false);
 		}
 		return map;
 	}
 
 	@Override
-	public Map<String, Object> nicknamecheck(HttpServletRequest request, HttpServletResponse response) {
+	public Map<String, Object> nicknameCheck(HttpServletRequest request, HttpServletResponse response) {
 		String nickname = request.getParameter("nickname");
 		Map<String, Object> map = new HashMap<>();
-		
+
 		String nicknameResult = springUserDao.nicknameCheck(nickname);
 		if (nicknameResult == null) {
 			map.put("nicknamecheck", true);
@@ -160,17 +167,17 @@ public class SpringUserServiceImpl implements SpringUserService {
 		}
 		return map;
 	}
-	
+
 	@Override
 	public Map<String, Object> login(HttpServletRequest request, HttpServletResponse response) {
 		Map<String, Object> result = new HashMap<String, Object>();
 		result.put("result", false);
 		String email = request.getParameter("email");
 		String pw = request.getParameter("pw");
-		
+
 		List<SpringUser> list = springUserDao.login();
 		String key = "itggangpae";
-		
+
 		try {
 			for(SpringUser user : list) {
 				if(CryptoUtil.decryptAES256(user.getEmail(), key).equals(email)  && BCrypt.checkpw(pw, user.getPw())) {
@@ -181,13 +188,13 @@ public class SpringUserServiceImpl implements SpringUserService {
 					break;
 				}
 			}
-			}catch(Exception e) {
-				System.out.println(e.getMessage());
-			}
-			request.getSession().setAttribute("userinfo", result);				
-			return result;
+		}catch(Exception e) {
+			System.out.println(e.getMessage());
 		}
-	
+		request.getSession().setAttribute("userinfo", result);				
+		return result;
+	}
+
 	@Override
 	public Map<String, Object> update(MultipartHttpServletRequest request, HttpServletResponse response) {
 		// 결과 초기화
@@ -199,7 +206,7 @@ public class SpringUserServiceImpl implements SpringUserService {
 		String pw = request.getParameter("pw");
 		String nickname = request.getParameter("nickname");
 		String image = (String)((HashMap) request.getSession().getAttribute("userinfo")).get("image");
-		
+
 		MultipartFile imageFile = request.getFile("image");
 		if (imageFile.isEmpty() == false) {
 			String filePath = request.getServletContext().getRealPath("/profile");
@@ -217,7 +224,7 @@ public class SpringUserServiceImpl implements SpringUserService {
 				System.out.println("전송 실패");
 			}
 		}
-		
+
 		SpringUser user = new SpringUser();
 		try {
 			user.setEmail(email);
@@ -234,5 +241,5 @@ public class SpringUserServiceImpl implements SpringUserService {
 		}
 		return map;
 	}
-		
+
 }
