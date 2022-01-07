@@ -90,7 +90,7 @@
 		view-name="/board/boardwrite" />
 	<view-controller path="/board/noticewrite"
 		view-name="/board/noticewrite" />
-
+	<!-- 
 	<interceptors>
 		<interceptor>
 			<mapping path="/board/boardwrite" />
@@ -102,6 +102,6 @@
 			<beans:ref bean="loginInterceptor" />
 		</interceptor>
 	</interceptors>
-
+ 	-->
 
 </beans:beans>

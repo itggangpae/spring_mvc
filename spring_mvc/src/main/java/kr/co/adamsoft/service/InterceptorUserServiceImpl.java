@@ -7,12 +7,13 @@ import kr.co.adamsoft.util.CryptoUtil;
 import java.util.List;
 
 import org.mindrot.jbcrypt.BCrypt;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class InterceptorUserServiceImpl implements InterceptorUserService {
 
-	//@Autowired
+	@Autowired
 	private SpringUserMapper springUserDao;
 	
 	@Override
@@ -23,14 +24,14 @@ public class InterceptorUserServiceImpl implements InterceptorUserService {
 		List<SpringUser> list = springUserDao.login();
 		String key = "itggangpae";
 
-		SpringUser springuser = new SpringUser();
+		SpringUser loginUser = null;
 		try {
 			for(SpringUser user : list) {
 				if(CryptoUtil.decryptAES256(user.getEmail(), key).equals(email)  && BCrypt.checkpw(pw, user.getPw())) {
-					springuser.setEmail(email);
-					springuser.setImage(user.getImage());
-					springuser.setNickname(user.getNickname());
-					
+					loginUser = new SpringUser();
+					loginUser.setEmail(email);
+					loginUser.setImage(user.getImage());
+					loginUser.setNickname(user.getNickname());
 					
 					break;
 				}
@@ -38,6 +39,6 @@ public class InterceptorUserServiceImpl implements InterceptorUserService {
 		}catch(Exception e) {
 			System.out.println(e.getMessage());
 		}
-		return springuser;
+		return loginUser;
 	}
 }

@@ -24,14 +24,14 @@ public class AuthInterceptor implements HandlerInterceptor {
 				query = "?" + query;
 			}
 			if (request.getMethod().equals("GET")) {
-			request.getSession().setAttribute("dest", uri + query);
+				request.getSession().setAttribute("dest", uri + query);
 			}
-			response.sendRedirect("../interceptor/login");
+			response.sendRedirect("/interceptor/login");
 			return false;
 		}
 		return true;
 	}
-	
+
 	@Override
 	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
 			ModelAndView modelAndView) throws Exception {
@@ -42,3 +42,4 @@ public class AuthInterceptor implements HandlerInterceptor {
 			throws Exception {
 	}
 }
+

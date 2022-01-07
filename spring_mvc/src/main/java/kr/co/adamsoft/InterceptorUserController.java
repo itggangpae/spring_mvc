@@ -18,13 +18,13 @@ public class InterceptorUserController {
 		return "interceptor/login";
 	}
 	
-	//@Autowired
+	@Autowired
 	private InterceptorUserService interceptorUserService;
 
 	@RequestMapping(value = "interceptor/login", method = RequestMethod.POST)
-	public void login(SpringUser SpringUser, Model model) {
+	public void login(SpringUser SpringUser,HttpSession session) {
 		SpringUser vo = interceptorUserService.login(SpringUser);
-		model.addAttribute("vo", vo);
+		session.setAttribute("LOGIN", vo);
 	}
 	
 	@RequestMapping(value = "/interceptor/logout", method = RequestMethod.GET)

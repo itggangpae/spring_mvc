@@ -33,18 +33,17 @@ public class LoginInterceptor implements HandlerInterceptor {
 			ModelAndView modelAndView) throws Exception {
 		if (request.getMethod().equals("POST")) {
 			HttpSession session = request.getSession();
+			SpringUser springUser = (SpringUser)session.getAttribute("LOGIN");
 
-			ModelMap modelMap = modelAndView.getModelMap();
-			SpringUser SpringUser = (SpringUser) modelMap.get("vo");
-
-			if (SpringUser != null) {
+			if (springUser != null) {
 				System.out.println("유저 로그인 성공");
-				session.setAttribute("LOGIN", SpringUser);
+				session.setAttribute("LOGIN", springUser);
 				Object dest = session.getAttribute("dest");
-				response.sendRedirect(dest != null ? (String) dest : "./");
+				response.sendRedirect(dest != null ? (String) dest : "/");
 			} else {
 				System.out.println("유저 로그인 실패");
 				session.setAttribute("msg", "email 이나 비밀번호가 잘못되었습니다.");
+				response.sendRedirect("/interceptor/login");
 			}
 		}
 	}

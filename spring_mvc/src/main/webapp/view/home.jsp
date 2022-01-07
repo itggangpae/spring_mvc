@@ -39,6 +39,7 @@
 		
 		<h3>인터셉터 적용</h3>
 		<ul>
+			<!-- 로그인 성공했을 때 로그인 정보를 LOGIN 이라는 키로 Session 에 저장 -->
 			<c:if test="${LOGIN == null }">
 				<li><a href="interceptor/login" class="menu">로그인</a></li>
 			</c:if>
